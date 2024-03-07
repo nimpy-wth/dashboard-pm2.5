@@ -1,5 +1,5 @@
 from dash import Dash
-#import dash_bootstrap_components as dbc
+import dash_bootstrap_components as dbc
 from dash import html, dcc, Input, Output
 
 import pandas as pd
@@ -78,10 +78,21 @@ app.layout = html.Div(
                     ),
                     className="card",
                 ),
+            ],
+            className="wrapper",
+        ),
+        html.Div(
+            children=[
                 html.Div(
-                    children=dcc.Graph(
-                        id="mean-chart", config={"displayModeBar": False},
-                    ),
+                    children=[
+                        html.Div(
+                            className="menu-title"
+                        ),
+                        html.Div(
+                            id="stats-table",
+                            className="stats-table"
+                        ),
+                    ],
                     className="card",
                 ),
             ],
@@ -148,6 +159,28 @@ def update_mean_chart(selected_parameter, start_date, end_date):
         "colorway": ["#FFA500"],  # or any other color
     }
     return {"data": [trace], "layout": layout}
+
+@app.callback(
+    Output("stats-table", "children"),
+    [
+        Input("parameter-filter", "value"),
+        Input("date-range", "start_date"),
+        Input("date-range", "end_date"),
+    ],
+)
+def update_stats_table(selected_parameter, start_date, end_date):
+    mask = (
+        (data["DATETIMEDATA"] >= start_date)
+        & (data["DATETIMEDATA"] <= end_date)
+    )
+    filtered_data = data.loc[mask]
+    stats = filtered_data[selected_parameter].describe().reset_index().round(2)
+    stats.columns = ["Statistic", "Value"]
+    stats_table = dbc.Table.from_dataframe(stats, striped=True, bordered=True, hover=True, className="custom-table")
+    
+    title = html.Div(children=f"Statistics - {selected_parameter} ({start_date}-{end_date})", className="menu-title")
+    
+    return [title, stats_table]
 
 
 if __name__ == "__main__":
