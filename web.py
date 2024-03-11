@@ -88,9 +88,11 @@ app.layout = html.Div(
                         html.Div(
                             className="menu-title"
                         ),
+                        dcc.Graph(id="stats-chart", style={"width": "48%"}),
                         html.Div(
                             id="stats-table",
-                            className="stats-table"
+                            className="stats-table",
+                            style={"width": "48%"},
                         ),
                     ],
                     className="card",
@@ -127,12 +129,13 @@ def update_chart(selected_parameter, start_date, end_date):
         "title": f"{selected_parameter} over Time",
         "xaxis": {"title": "Datetime"},
         "yaxis": {"title": selected_parameter},
-        "colorway": ["#ffb7c5"],  # or any other color 
+        "colorway": ["#ffb7c5"],  # or any other color
     }
     return {"data": [trace], "layout": layout}
 
+
 @app.callback(
-    Output("mean-chart", "figure"),
+    Output("stats-chart", "figure"),
     [
         Input("parameter-filter", "value"),
         Input("date-range", "start_date"),
@@ -140,25 +143,27 @@ def update_chart(selected_parameter, start_date, end_date):
     ],
 )
 def update_mean_chart(selected_parameter, start_date, end_date):
+    
     mask = (
-        (data["DATETIMEDATA"] >= start_date)
-        & (data["DATETIMEDATA"] <= end_date)
-    )
+    (data["DATETIMEDATA"] >= start_date)
+    & (data["DATETIMEDATA"] <= end_date)
+)
     filtered_data = data.loc[mask]
-    mean_value = filtered_data[selected_parameter].mean()
-    trace = {
-        "x": [selected_parameter],
-        "y": [mean_value],
-        "type": "bar",
-        "name": "Mean",
-    }
-    layout = {
-        "title": f"Mean {selected_parameter}",
-        "xaxis": {"title": "Parameter"},
-        "yaxis": {"title": "Mean Value"},
-        "colorway": ["#FFA500"],  # or any other color
-    }
-    return {"data": [trace], "layout": layout}
+    # static_values = {"Mean": 10, "Std": 2, "Min": 8, "Max": 15}  # Replace with actual calculations
+    # stats = pd.DataFrame.from_dict({"Statistic": static_values.keys(), "Value": static_values.values()})
+    stats = filtered_data[selected_parameter].describe().reset_index().round(2)
+    stats.columns = ["Statistic", "Value"]
+
+    fig = px.bar(
+        stats,
+        x="Statistic",
+        y="Value",
+        title=f"Statistics - {selected_parameter} ({start_date}-{end_date})",
+        color="Statistic",
+    ).update_layout(plot_bgcolor="#F5F5F5") 
+
+    return fig
+
 
 @app.callback(
     Output("stats-table", "children"),
@@ -181,7 +186,6 @@ def update_stats_table(selected_parameter, start_date, end_date):
     title = html.Div(children=f"Statistics - {selected_parameter} ({start_date}-{end_date})", className="menu-title")
     
     return [title, stats_table]
-
 
 if __name__ == "__main__":
     app.run_server(debug=True)
