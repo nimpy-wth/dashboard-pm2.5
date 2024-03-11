@@ -1,4 +1,5 @@
 pandas
 requests
-dash
+dash 
 pycaret
+dash-bootstrap-components
