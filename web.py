@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.express as px
 
 data = pd.read_csv("cleaned_data.csv")
+predict_data = pd.read_csv("hatyai.csv")
 data["DATETIMEDATA"] = pd.to_datetime(data["DATETIMEDATA"], format="%Y-%m-%d %H:%M:%S")
 data.sort_values("DATETIMEDATA", inplace=True)
 
@@ -70,6 +71,7 @@ app.layout = html.Div(
             ],
             className="menu",
         ),
+        
         html.Div(
             children=[
                 html.Div(
@@ -108,17 +110,39 @@ app.layout = html.Div(
             ],
             className="wrapper",
         ),
-                # html.Div(  # Wrapper for button and potential future content
-        #     className="wrapper",
-        #     children=[
-        #         dcc.Location(id="url", refresh=False),  # Track URL changes
-        #         html.Button(
-        #             children="Predict Air Quality", id="predict-button", n_clicks=0
-        #         ),
-        #         # Add a placeholder for potential future content below the button
-        #         html.Div(id="predict-content")  # Optional placeholder
-        #     ],
-        # ),
+
+
+        html.Div(
+            children=[
+                html.Div(
+                    children=[
+                        html.Div(children="Parameter", className="menu-title"),
+                        dcc.Dropdown(
+                            id="parameter-predict",
+                            options=[
+                                {"label": param, "value": param}
+                                for param in predict_data.columns[1:]
+                            ],
+                            value="PM25",
+                            clearable=False,
+                            className="dropdown",
+                        ),
+                    ]
+                ),
+            ],
+            className="menu",
+        ),
+        html.Div(
+            children=[
+                html.Div(
+                    children=dcc.Graph(
+                        id="predict-chart", config={"displayModeBar": False},
+                    ),
+                    className="card",
+                ),
+            ],
+            className="wrapper",
+        ),
     ]
 )
 
@@ -159,7 +183,7 @@ def update_chart(selected_parameter, start_date, end_date):
         Input("date-range", "end_date"),
     ],
 )
-def update_mean_chart(selected_parameter, start_date, end_date):
+def update_stats_chart(selected_parameter, start_date, end_date):
     
     mask = (
     (data["DATETIMEDATA"] >= start_date)
@@ -203,6 +227,36 @@ def update_stats_table(selected_parameter, start_date, end_date):
     title = html.Div(children=f"Statistics - {selected_parameter} ({start_date}-{end_date})", className="menu-title")
     
     return [title, stats_table]
+
+############################################# PREDICTION GRAPH #############################################
+
+@app.callback(
+    Output("predict-chart", "figure"),
+    [
+        Input("parameter-predict", "value"),
+        Input("date-range", "start_date"),
+        Input("date-range", "end_date"),
+    ],
+)
+def update_predict_chart(selected_parameter, start_date, end_date):
+    mask = (
+        (data["DATETIMEDATA"] >= start_date)
+        & (data["DATETIMEDATA"] <= end_date)
+    )
+    filtered_data = predict_data.loc[mask]
+    trace = {
+        "x": filtered_data["DATETIMEDATA"],
+        "y": filtered_data[selected_parameter],
+        "type": "lines",
+        "name": selected_parameter,
+    }
+    layout = {
+        "title": f"{selected_parameter} Prediction for the next week",
+        "xaxis": {"title": "Datetime"},
+        "yaxis": {"title": selected_parameter},
+        "colorway": ["#579AF5"],  # or any other color
+    }
+    return {"data": [trace], "layout": layout}
 
 if __name__ == "__main__":
     app.run_server(debug=True)
