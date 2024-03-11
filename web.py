@@ -108,6 +108,17 @@ app.layout = html.Div(
             ],
             className="wrapper",
         ),
+                # html.Div(  # Wrapper for button and potential future content
+        #     className="wrapper",
+        #     children=[
+        #         dcc.Location(id="url", refresh=False),  # Track URL changes
+        #         html.Button(
+        #             children="Predict Air Quality", id="predict-button", n_clicks=0
+        #         ),
+        #         # Add a placeholder for potential future content below the button
+        #         html.Div(id="predict-content")  # Optional placeholder
+        #     ],
+        # ),
     ]
 )
 
@@ -192,17 +203,6 @@ def update_stats_table(selected_parameter, start_date, end_date):
     title = html.Div(children=f"Statistics - {selected_parameter} ({start_date}-{end_date})", className="menu-title")
     
     return [title, stats_table]
-
-@app.callback(
-    Output("predict-content", "children"),
-    [Input("predict-button", "n_clicks")],
-)
-def update_predict_content(n_clicks):
-    if n_clicks > 0:
-        return html.Div(
-            children="PM2.5 Predictio"
-        )
-    return None
 
 if __name__ == "__main__":
     app.run_server(debug=True)
