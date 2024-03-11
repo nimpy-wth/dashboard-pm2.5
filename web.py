@@ -5,7 +5,7 @@ from dash import html, dcc, Input, Output
 import pandas as pd
 import plotly.express as px
 
-data = pd.read_csv("hatyai.csv")
+data = pd.read_csv("cleaned_data.csv")
 data["DATETIMEDATA"] = pd.to_datetime(data["DATETIMEDATA"], format="%Y-%m-%d %H:%M:%S")
 data.sort_values("DATETIMEDATA", inplace=True)
 
@@ -127,7 +127,7 @@ def update_chart(selected_parameter, start_date, end_date):
         "title": f"{selected_parameter} over Time",
         "xaxis": {"title": "Datetime"},
         "yaxis": {"title": selected_parameter},
-        "colorway": ["#ffb7c5"],  # or any other color
+        "colorway": ["#ffb7c5"],  # or any other color 
     }
     return {"data": [trace], "layout": layout}
 
