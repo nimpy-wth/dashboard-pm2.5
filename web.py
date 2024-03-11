@@ -88,21 +88,27 @@ app.layout = html.Div(
                         html.Div(
                             className="menu-title"
                         ),
-                        dcc.Graph(id="stats-chart", style={"width": "48%"}),
                         html.Div(
                             id="stats-table",
                             className="stats-table",
-                            style={"width": "48%"},
                         ),
                     ],
                     className="card",
+                    style={"width": "48%", "float": "right"},  # Add this line
+                ),
+                html.Div(
+                    html.Div(
+                    children=dcc.Graph(id="stats-chart", 
+                    # style={"width": "48%", "float": "left"}
+                    ),
+                ),
+                    className="card",
+                    style={"width": "50%", "float": "left"},  # Add this line
                 ),
             ],
             className="wrapper",
         ),
     ]
-
-    
 )
 
 @app.callback(
@@ -186,6 +192,17 @@ def update_stats_table(selected_parameter, start_date, end_date):
     title = html.Div(children=f"Statistics - {selected_parameter} ({start_date}-{end_date})", className="menu-title")
     
     return [title, stats_table]
+
+@app.callback(
+    Output("predict-content", "children"),
+    [Input("predict-button", "n_clicks")],
+)
+def update_predict_content(n_clicks):
+    if n_clicks > 0:
+        return html.Div(
+            children="PM2.5 Predictio"
+        )
+    return None
 
 if __name__ == "__main__":
     app.run_server(debug=True)
