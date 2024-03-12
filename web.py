@@ -4,11 +4,16 @@ from dash import html, dcc, Input, Output
 
 import pandas as pd
 import plotly.express as px
+import datetime
+from dateutil.relativedelta import relativedelta
 
 data = pd.read_csv("cleaned_data.csv")
-predict_data = pd.read_csv("train.csv")
 data["DATETIMEDATA"] = pd.to_datetime(data["DATETIMEDATA"], format="%Y-%m-%d %H:%M:%S")
 data.sort_values("DATETIMEDATA", inplace=True)
+
+predict_data = pd.read_csv("predict_data/predictions_PM25.csv")
+predict_data["DATETIMEDATA"] = pd.to_datetime(predict_data["DATETIMEDATA"], format="%Y-%m-%d %H:%M:%S")
+predict_data.sort_values("DATETIMEDATA", inplace=True)
 
 external_stylesheets = [
     {
@@ -246,6 +251,21 @@ predict_page = html.Div(
                         ),
                     ]
                 ),
+                html.Div(
+                    children=[
+                        html.Div(
+                            children="Date Range",
+                            className="menu-title"
+                        ),
+                        dcc.DatePickerRange(
+                            id="date-range",
+                            min_date_allowed=predict_data["DATETIMEDATA"].min().date(),
+                            max_date_allowed=predict_data["DATETIMEDATA"].max().date(),
+                            start_date=predict_data["DATETIMEDATA"].min().date(),
+                            end_date=predict_data["DATETIMEDATA"].max().date(),
+                        ),
+                    ]
+                ),
             ],
             className="menu",
         ),
@@ -271,10 +291,11 @@ predict_page = html.Div(
         Input("date-range", "end_date"),
     ],
 )
+
 def update_predict_chart(selected_parameter, start_date, end_date):
     mask = (
-        (data["DATETIMEDATA"] >= start_date)
-        & (data["DATETIMEDATA"] <= end_date)
+        (predict_data["DATETIMEDATA"] >= start_date)
+        & (predict_data["DATETIMEDATA"] <= end_date)
     )
     filtered_data = predict_data.loc[mask]
     trace = {
@@ -284,7 +305,7 @@ def update_predict_chart(selected_parameter, start_date, end_date):
         "name": selected_parameter,
     }
     layout = {
-        "title": f"{selected_parameter} Prediction for the next week",
+        "title": f"{selected_parameter} Prediction",
         "xaxis": {"title": "Datetime"},
         "yaxis": {"title": selected_parameter},
         "colorway": ["#579AF5"],  # or any other color
@@ -298,7 +319,9 @@ app.layout = html.Div([
     ]
 )
 
-@app.callback(Output('page-content', 'children'), Input('url', 'pathname'))
+@app.callback(Output('page-content', 'children'), 
+            Input('url', 'pathname'),)
+
 def display_page(pathname):
     if pathname == '/':
         return home_layout
@@ -306,7 +329,6 @@ def display_page(pathname):
         return predict_page
     else:
         return '404 Page Not Found'
-    
 
 if __name__ == "__main__":
     app.run_server(debug=True)
