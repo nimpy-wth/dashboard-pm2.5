@@ -11,7 +11,7 @@ data = pd.read_csv("cleaned_data.csv")
 data["DATETIMEDATA"] = pd.to_datetime(data["DATETIMEDATA"], format="%Y-%m-%d %H:%M:%S")
 data.sort_values("DATETIMEDATA", inplace=True)
 
-predict_data = pd.read_csv("predict_data/predictions_PM25.csv")
+predict_data = pd.read_csv("predict_data/merged_predict_data.csv")
 predict_data["DATETIMEDATA"] = pd.to_datetime(predict_data["DATETIMEDATA"], format="%Y-%m-%d %H:%M:%S")
 predict_data.sort_values("DATETIMEDATA", inplace=True)
 
@@ -116,7 +116,7 @@ home_layout = html.Div(
                         ),
                     ],
                     className="card",
-                    style={"width": "48%", "float": "right"},  # Add this line
+                    style={"width": "48%", "float": "right"},  
                 ),
                 html.Div(
                     html.Div(
@@ -125,7 +125,7 @@ home_layout = html.Div(
                     ),
                 ),
                     className="card",
-                    style={"width": "50%", "float": "left"},  # Add this line
+                    style={"width": "50%", "float": "left"}, 
                 ),
             ],
             className="wrapper",
@@ -157,7 +157,7 @@ def update_chart(selected_parameter, start_date, end_date):
         "title": f"{selected_parameter} over Time",
         "xaxis": {"title": "Datetime"},
         "yaxis": {"title": selected_parameter},
-        "colorway": ["#ffb7c5"],  # or any other color
+        "colorway": ["#E26868"], 
     }
     return {"data": [trace], "layout": layout}
 
@@ -211,7 +211,8 @@ def update_stats_table(selected_parameter, start_date, end_date):
     stats.columns = ["Statistic", "Value"]
     stats_table = dbc.Table.from_dataframe(stats, striped=True, bordered=True, hover=True, className="custom-table")
     
-    title = html.Div(children=f"Statistics - {selected_parameter} ({start_date}-{end_date})", className="menu-title")
+    title = html.Div(children=f"Statistics - {selected_parameter} ({start_date}-{end_date})", 
+                    className="font-title")
     
     return [title, stats_table]
 
@@ -244,6 +245,11 @@ predict_page = html.Div(
                             options=[
                                 {"label": param, "value": param}
                                 for param in predict_data.columns[1:]
+                                # {"label": "PM25", "value": "PM25"},
+                                # {"label": "O3", "value": "O3"},
+                                # {"label": "WS", "value": "WS"},
+                                # {"label": "WD", "value": "WD"},
+                                # {"label": "TEMP", "value": "TEMP"},
                             ],
                             value="PM25",
                             clearable=False,
