@@ -1,11 +1,28 @@
 body {
     font-family: "Lato", sans-serif;
     margin: 0;
-    background-color: #F7F7F7;
+    background-color: #fbf9ee;
+}
+
+.navbar {
+    background-color: #0f1242;
+    color: #FFFFFF;
+    padding: 10px;
+    text-align: center;
+}
+
+.nav {
+    display: flex;
+}
+
+.nav a {
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 10px;
 }
 
 .header {
-    background-color: #222222;
+    background-color: #22265e;
     height: 288px;
     padding: 16px 0 0 0;
 }
@@ -73,11 +90,23 @@ body {
 .menu-title {
     margin-bottom: 6px;
     font-weight: bold;
-    color: #ffb7c5;
+    color: #ee5a05;
 }
+
+.font-title {
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #30200f;
+    background-color: #fcbf49;
+    padding: 10px;
+    /* border-radius: 8px; */
+}
+
 .custom-table {
     width: 100%;
     border-collapse: collapse;
+    background-color: #f9f9f9;
+
 }
 
 .custom-table th, .custom-table td {
