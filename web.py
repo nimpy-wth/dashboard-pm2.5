@@ -23,12 +23,12 @@ external_stylesheets = [
     },
 ]
 
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 server = app.server
-app.title = "Air Quality Analytics: Understand Air Quality!"
+app.title = "Air Quality Analytics"
 
 navbar = html.Div(
-    className="navbar",  # Added a class name for styling
+    className="navbar",  
     children=[
         html.Nav(
             className="nav",
@@ -314,7 +314,7 @@ def update_predict_chart(selected_parameter, start_date, end_date):
         "title": f"{selected_parameter} Prediction",
         "xaxis": {"title": "Datetime"},
         "yaxis": {"title": selected_parameter},
-        "colorway": ["#579AF5"],  # or any other color
+        "colorway": ["#579AF5"],  
     }
     return {"data": [trace], "layout": layout}
 
