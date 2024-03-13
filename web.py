@@ -12,7 +12,7 @@ data["DATETIMEDATA"] = pd.to_datetime(data["DATETIMEDATA"], format="%Y-%m-%d %H:
 data.sort_values("DATETIMEDATA", inplace=True)
 
 predict_data = pd.read_csv("predict_data/merged_predict_data.csv")
-predict_data["DATETIMEDATA"] = pd.to_datetime(predict_data["DATETIMEDATA"], format="%Y-%m-%d %H:%M:%S")
+predict_data["DATETIMEDATA"] = pd.to_datetime(predict_data["DATETIMEDATA"], format="%Y-%m-%d")
 predict_data.sort_values("DATETIMEDATA", inplace=True)
 
 external_stylesheets = [
